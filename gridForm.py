@@ -1,6 +1,6 @@
 import math as m
 
-import Centroid as C
+import centroid as C
 import point as P
 import triangle as T
 

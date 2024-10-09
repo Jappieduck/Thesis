@@ -12,32 +12,20 @@ class Centroid(P.Point):
     def getSoort(self):
         return self.soort
 
-    def plus(self, p):
-        return super().plus(p)
-
-    def getX(self):
-        return self.x
-
-    def getY(self):
-        return self.y
-
-    def times(self, c):
-        return super().times(c)
-
     def getConnect(self):
         x1, y1 = self.getX(), self.getY()
         if self.getSoort() == 'beta':
             driehoek = T.Triangle(self, 'beta')
             hoeken = driehoek.getVertices()
             top = hoeken[0].plus(hoeken[1]).plus(hoeken[0].plus(P.Point((0, 1)))).times(1 / 3)
-            bottom = hoeken[0].plus(hoeken[1]).plus(hoeken[0].plus(P.Point((0, -1)))).times(1 / 3)
+            bottom = hoeken[0].plus(hoeken[2]).plus(hoeken[0].plus(P.Point((0, -1)))).times(1 / 3)
             left = hoeken[1].plus(hoeken[2]).plus(hoeken[1].plus(P.Point((-m.cos(m.pi / 6), -m.sin(m.pi / 6))))).times(1 / 3)
             return [Centroid((left.getX(), left.getY()), 'alpha'), Centroid((top.getX(), top.getY()), 'alpha'), Centroid((bottom.getX(), bottom.getY()), 'alpha')]
         else:
             driehoek = T.Triangle(self, 'beta')
             hoeken = driehoek.getVertices()
             top = hoeken[0].plus(hoeken[1]).plus(hoeken[0].plus(P.Point((0, 1)))).times(1 / 3)
-            bottom = hoeken[0].plus(hoeken[1]).plus(hoeken[0].plus(P.Point((0, -1)))).times(1 / 3)
+            bottom = hoeken[0].plus(hoeken[2]).plus(hoeken[0].plus(P.Point((0, -1)))).times(1 / 3)
             left = hoeken[1].plus(hoeken[2]).plus(hoeken[1].plus(P.Point((m.cos(m.pi / 6), -m.sin(m.pi / 6))))).times(1 / 3)
             return [Centroid((left.getX(), left.getY()), 'alpha'), Centroid((top.getX(), top.getY()), 'alpha'), Centroid((bottom.getX(), bottom.getY()), 'alpha')]
 
@@ -45,11 +33,9 @@ class Centroid(P.Point):
         if self.getSoort() == 'alpha':
             plt.plot(self.getX(), self.getY(), color='white', marker='o', markeredgecolor='black')
             txt = (self.getX(), self.getY() + 0.1)
-            plt.annotate(r'$\alpha$', xy=txt)
         else:
             super().draw('black', 'o')
             txt = (self.getX() + 0.1, self.getY())
-            plt.annotate(r'$\beta$', xy=txt)
 
     def draw(self, col, style):
         self.drawPoint()
@@ -61,9 +47,6 @@ class Centroid(P.Point):
 
     def find(self, lst):
         for val in lst:
-            print(self.getX(), self.getY())
-            print(val.getX(), val.getY())
-            print('\n')
             if self.equals(val):
                 return True
         return False

@@ -33,4 +33,6 @@ class Point:
 
     def find(self, lst):
         for value in lst:
-            return self.equals(value)
+            if self.equals(value):
+                return True
+        return False

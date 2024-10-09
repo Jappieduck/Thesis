@@ -1,8 +1,8 @@
 import math as m
 import point as P
-import Drawing as D
+import gridForm as D
 import vertices as V
-import Centroid as C
+import centroid as C
 
 
 class Hexagon:

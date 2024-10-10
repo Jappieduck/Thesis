@@ -27,16 +27,25 @@ class Lozenge:
             centroids.append(neighbours[0])
         return centroids
 
+    # Dit moet nog aangepast worden, want machine precisie doet hier moeilijk.
     def getVertices(self):
         centroids = self.getCentroids()
+        soort = self.getSoort()
         driehoekBeta = T.Triangle(centroids[0], 'beta')
         driehoekAlpha = T.Triangle(centroids[1], 'alpha')
         vertBeta = driehoekBeta.getVertices()
         vertAlpha = driehoekAlpha.getVertices()
-        for hoek in vertAlpha:
-            if not hoek.find(vertBeta):
-                vertBeta.append(hoek)
+        if soort == 'Up':
+            vertBeta.append(vertAlpha[1])
+        if soort == 'Down':
+            vertBeta.append(vertAlpha[2])
+        else:
+            vertBeta.append(vertAlpha[0])
         return vertBeta
+
+    def drawDime(self):
+        centres = self.getCentroids()
+        centres[0].connect(centres[1], 'red', '-')
 
     def draw(self):
         color = 'black'

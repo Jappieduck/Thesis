@@ -1,7 +1,5 @@
 import math as m
 import point as P
-import gridForm as D
-import vertices as V
 import centroid as C
 
 

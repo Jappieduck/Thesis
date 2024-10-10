@@ -8,12 +8,18 @@ class Centroid(P.Point):
     def __init__(self, coord, soort):
         super().__init__(coord)
         self.soort = soort
+        self.connected = False
 
     def getSoort(self):
         return self.soort
 
+    def setConnection(self, boolean):
+        self.connected = boolean
+
+    def getConnection(self):
+        return self.connected
+
     def getConnect(self):
-        x1, y1 = self.getX(), self.getY()
         if self.getSoort() == 'beta':
             driehoek = T.Triangle(self, 'beta')
             hoeken = driehoek.getVertices()
@@ -22,7 +28,7 @@ class Centroid(P.Point):
             left = hoeken[1].plus(hoeken[2]).plus(hoeken[1].plus(P.Point((-m.cos(m.pi / 6), -m.sin(m.pi / 6))))).times(1 / 3)
             return [Centroid((left.getX(), left.getY()), 'alpha'), Centroid((top.getX(), top.getY()), 'alpha'), Centroid((bottom.getX(), bottom.getY()), 'alpha')]
         else:
-            driehoek = T.Triangle(self, 'beta')
+            driehoek = T.Triangle(self, 'alpha')
             hoeken = driehoek.getVertices()
             top = hoeken[0].plus(hoeken[1]).plus(hoeken[0].plus(P.Point((0, 1)))).times(1 / 3)
             bottom = hoeken[0].plus(hoeken[2]).plus(hoeken[0].plus(P.Point((0, -1)))).times(1 / 3)
@@ -50,3 +56,8 @@ class Centroid(P.Point):
             if self.equals(val):
                 return True
         return False
+
+    def connect(self, p, color, style):
+        super().connect(p, color, style)
+        self.setConnection(True)
+        p.setConnection(True)

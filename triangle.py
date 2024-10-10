@@ -1,6 +1,5 @@
 import math as m
 import point as P
-import gridForm as D
 
 
 class Triangle:
@@ -15,7 +14,7 @@ class Triangle:
         return self.centre
 
     def getVertices(self):
-        C = self.getCentre()
+        C = P.Point((self.getCentre().getX(), self.getCentre().getY()))
         if self.getSoort() == "alpha":
             a = P.Point((-m.sqrt(3)/3, 0)).plus(C)
             b = P.Point((m.sqrt(3)/6, 1/2)).plus(C)

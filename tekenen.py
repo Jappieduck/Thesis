@@ -33,15 +33,23 @@ def bipartiteGraphInGrid(length):
 def randomDimes(length):
     valid = False
     while not valid:
-        valid = True
         zeshoek = H.Hexagon(O, 'Standing', length)
+        D.drawBipartitGraph(zeshoek)
         lastAlpha, lozenges = D.randomTiling(zeshoek, 'Left')
-        for alpha in lastAlpha:
-            if not alpha.getConnection():
-                valid = False
-                plt.clf()
+        valid = D.isValid(lastAlpha)
+        if not valid:
+            plt.clf()
+        else:
+            D.drawDimes(lozenges)
+        beta, alpha = D.get_Centroids(zeshoek)
+        for c in beta:
+            c.drawPoint()
+        for c in alpha:
+            c.drawPoint()
     plt.axis('equal')
     plt.axis('off')
+    name = 'DimerModel.png'
+    plt.savefig(pad + name, bbox_inches='tight')
     plt.show()
 
 
@@ -57,7 +65,10 @@ def randomTiles(length):
             D.drawLozenges(lozenges)
     plt.axis('equal')
     plt.axis('off')
+    name = 'RandomTiling.png'
+    plt.savefig(pad + name, bbox_inches='tight')
     plt.show()
 
 
-randomTiles(1)
+randomTiles(5)
+randomDimes(5)

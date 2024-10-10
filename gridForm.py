@@ -96,8 +96,6 @@ def sorteer(lst, soort, lengte):
             newlst.append(lst[i])
         rijen.append(newlst[:])
         begin = begin + val
-        for point in newlst:
-            point.drawPoint()
     if soort == 'alpha':
         rijen.reverse()
     return rijen
@@ -149,70 +147,85 @@ def randomTiling(zeshoek, soort):
     alpha.remove(alpha[0])
     betaSorted = sorteer(beta, 'beta', lengte)
     alphaSorted = sorteer(alpha, 'alpha', lengte)
-    for i in range(len(betaSorted)-1):
+    for i in range(len(betaSorted) - 1):
         if i >= lengte:
-            if not betaSorted[i][len(betaSorted[i])-1].getConnection():
-                betaSorted[i][-1].connect(alphaSorted[i][-1], 'red', '-')
-                ruit = L.Lozenge(betaSorted[i][-1], 'Down')
-                lozenges.append(ruit)
+            if not betaSorted[i][len(betaSorted[i]) - 1].getConnection():
+                betaSorted[i][-1].setConnection(True)
+                alphaSorted[i][-1].setConnection(True)
+                lozenges.append(L.Lozenge(betaSorted[i][-1], 'Down'))
         for j in range(len(betaSorted[i])):
             c = betaSorted[i][j]
             if not c.getConnection():
                 p = random.uniform(0, 1)
                 kansen = [p, 1 - p]
                 buren = []
-                left = None
-                top = None
-                bottom = None
+                left = [None, 'Left']
+                top = [None, 'Up']
+                bottom = [None, 'Down']
                 if i > 0:
-                    left = alphaSorted[i-1][j]
+                    left[0] = alphaSorted[i - 1][j]
                 if i < lengte:
-                    top = alphaSorted[i][j]
-                    bottom = alphaSorted[i][j+1]
+                    top[0] = alphaSorted[i][j + 1]
+                    bottom[0] = alphaSorted[i][j]
                 else:
                     if j == 0:
-                        bottom = alphaSorted[i][j]
-                    elif j < len(betaSorted[i])-1:
-                        bottom = alphaSorted[i][j]
-                        top = alphaSorted[i][j - 1]
+                        top[0] = alphaSorted[i][j]
+                        bottom[0] = None
+                    elif j < len(betaSorted[i]) - 1:
+                        bottom[0] = alphaSorted[i][j - 1]
+                        top[0] = alphaSorted[i][j]
                     else:
-                        top = None
+                        bottom[0] = alphaSorted[i][j + 1]
+                        top[0] = None
                 if soort == 'Left':
-                    if top is not None:
+                    if top[0] is not None:
                         buren.append(top)
-                    if bottom is not None:
+                    if bottom[0] is not None:
                         buren.append(bottom)
-                elif soort == 'Top':
-                    if bottom is not None:
+                elif soort == 'Up':
+                    if bottom[0] is not None:
                         buren.append(bottom)
-                    if left is not None:
+                    if left[0] is not None:
                         buren.append(left)
-                elif soort == 'Bottom':
-                    if top is not None:
+                elif soort == 'Down':
+                    if top[0] is not None:
                         buren.append(top)
-                    if left is not None:
+                    if left[0] is not None:
                         buren.append(left)
                 if len(buren) == 1:
-                    buren[0].connect(c, 'red', '-')
-                elif isConnected(buren[0], alpha):
-                    buren[1].connect(c, 'red', '-')
-                elif isConnected(buren[1], alpha):
-                    buren[0].connect(c, 'red', '-')
+                    lozenges.append(L.Lozenge(c, buren[0][1]))
+                    buren[0][0].setConnection(True)
+                    c.setConnection(True)
                 elif len(buren) > 1:
-                    keuze = random.choices(buren, kansen)
-                    punt = keuze[0]
-                    punt.connect(c, 'red', '-')
+                    if isConnected(buren[0][0], alpha):
+                        buren[1][0].setConnection(True)
+                        c.setConnection(True)
+                        lozenges.append(L.Lozenge(c, buren[1][1]))
+                    elif isConnected(buren[1][0], alpha):
+                        buren[0][0].setConnection(True)
+                        c.setConnection(True)
+                        lozenges.append(L.Lozenge(c, buren[0][1]))
+                    else:
+                        keuze = random.choices(buren, kansen)
+                        punt = keuze[0]
+                        punt[0].setConnection(True)
+                        c.setConnection(True)
+                        lozenges.append(L.Lozenge(c, punt[1]))
         for j in range(len(alphaSorted[i])):
             punt = alphaSorted[i][j]
             if not punt.getConnection():
                 if soort == 'Left':
-                    punt.connect(betaSorted[i+1][j], 'red', '-')
-                    lozenges.append(L.Lozenge(betaSorted[i+1][j], 'Left'))
+                    punt.setConnection(True)
+                    betaSorted[i + 1][j].setConnection(True)
+                    lozenges.append(L.Lozenge(betaSorted[i + 1][j], 'Left'))
                 elif soort == 'Top':
-                    punt.connect(betaSorted[i][j], 'red', '-')
-                    lozenges.append(L.Lozenge(betaSorted[i][j], 'Bottom'))
+                    punt.setConnection(True)
+                    betaSorted[i][j].setConnection(True)
+                    lozenges.append(L.Lozenge(betaSorted[i][j], 'Down'))
                 elif soort == 'Bottom':
-                    lozenges.append(L.Lozenge(betaSorted[i][j], 'Top'))
+                    betaSorted[i][j].setConnection(True)
+                    punt.setConnection(True)
+                    lozenges.append(L.Lozenge(betaSorted[i][j], 'Up'))
     up = True
     for j in range(len(betaSorted[-1])):
         newUp = up
@@ -221,14 +234,17 @@ def randomTiling(zeshoek, soort):
             newUp = not up
         if newUp == up:
             if newUp:
-                if j == len(betaSorted[-1])-1:
-                    c.connect(alphaSorted[-1][j - 1], 'red', '-')
+                if j == len(betaSorted[-1]) - 1:
+                    c.setConnection(True)
+                    alphaSorted[-1][j - 1].setConnection(True)
                     lozenges.append(L.Lozenge(c, 'Down'))
                 else:
-                    c.connect(alphaSorted[-1][j], 'red', '-')
+                    c.setConnection(True)
+                    alphaSorted[-1][j].setConnection(True)
                     lozenges.append(L.Lozenge(c, 'Up'))
             else:
-                c.connect(alphaSorted[-1][j-1], 'red', '-')
+                c.setConnection(True)
+                alphaSorted[-1][j - 1].setConnection(True)
                 lozenges.append(L.Lozenge(c, 'Down'))
         up = newUp
     return alphaSorted[-1], lozenges
@@ -244,3 +260,8 @@ def isValid(alphas):
 def drawLozenges(lst):
     for loz in lst:
         loz.draw()
+
+
+def drawDimes(lst):
+    for loz in lst:
+        loz.drawDime()

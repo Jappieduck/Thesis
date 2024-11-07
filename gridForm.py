@@ -139,7 +139,7 @@ def isConnected(punt, lst):
             return c.getConnection()
 
 
-def randomTiling(zeshoek, soort):
+def randomTiling(zeshoek):
     lozenges = []
     lengte = zeshoek.getLength()
     beta, alpha = get_Centroids(zeshoek)
@@ -177,21 +177,10 @@ def randomTiling(zeshoek, soort):
                     else:
                         bottom[0] = alphaSorted[i][j + 1]
                         top[0] = None
-                if soort == 'Left':
-                    if top[0] is not None:
-                        buren.append(top)
-                    if bottom[0] is not None:
-                        buren.append(bottom)
-                elif soort == 'Up':
-                    if bottom[0] is not None:
-                        buren.append(bottom)
-                    if left[0] is not None:
-                        buren.append(left)
-                elif soort == 'Down':
-                    if top[0] is not None:
-                        buren.append(top)
-                    if left[0] is not None:
-                        buren.append(left)
+                if top[0] is not None:
+                    buren.append(top)
+                if bottom[0] is not None:
+                    buren.append(bottom)
                 if len(buren) == 1:
                     lozenges.append(L.Lozenge(c, buren[0][1]))
                     buren[0][0].setConnection(True)
@@ -214,18 +203,9 @@ def randomTiling(zeshoek, soort):
         for j in range(len(alphaSorted[i])):
             punt = alphaSorted[i][j]
             if not punt.getConnection():
-                if soort == 'Left':
-                    punt.setConnection(True)
-                    betaSorted[i + 1][j].setConnection(True)
-                    lozenges.append(L.Lozenge(betaSorted[i + 1][j], 'Left'))
-                elif soort == 'Top':
-                    punt.setConnection(True)
-                    betaSorted[i][j].setConnection(True)
-                    lozenges.append(L.Lozenge(betaSorted[i][j], 'Down'))
-                elif soort == 'Bottom':
-                    betaSorted[i][j].setConnection(True)
-                    punt.setConnection(True)
-                    lozenges.append(L.Lozenge(betaSorted[i][j], 'Up'))
+                punt.setConnection(True)
+                betaSorted[i + 1][j].setConnection(True)
+                lozenges.append(L.Lozenge(betaSorted[i + 1][j], 'Left'))
     up = True
     for j in range(len(betaSorted[-1])):
         newUp = up

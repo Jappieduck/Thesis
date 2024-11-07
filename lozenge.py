@@ -27,7 +27,6 @@ class Lozenge:
             centroids.append(neighbours[0])
         return centroids
 
-    # Dit moet nog aangepast worden, want machine precisie doet hier moeilijk.
     def getVertices(self):
         centroids = self.getCentroids()
         soort = self.getSoort()
@@ -39,7 +38,7 @@ class Lozenge:
             vertBeta.append(vertAlpha[1])
         if soort == 'Down':
             vertBeta.append(vertAlpha[2])
-        else:
+        elif soort == 'Left':
             vertBeta.append(vertAlpha[0])
         return vertBeta
 
@@ -62,8 +61,55 @@ class Lozenge:
             vert[1].connect(vert[2], color, style)
             vert[2].connect(vert[3], color, style)
             vert[3].connect(vert[0], color, style)
-        else:
+        elif soort == 'Left':
             vert[0].connect(vert[1], color, style)
             vert[1].connect(vert[3], color, style)
             vert[3].connect(vert[2], color, style)
             vert[2].connect(vert[0], color, style)
+
+    def drawPath(self, soort):
+        color = 'red'
+        colP = 'green'
+        style = '-'
+        mark = 'o'
+        lozSoort = self.getSoort()
+        hoekpunten = self.getVertices()
+        if lozSoort == 'Up':
+            if soort == 'LR':
+                m1 = hoekpunten[0].plus(hoekpunten[3]).times(1 / 2)
+                m2 = hoekpunten[1].plus(hoekpunten[2]).times(1 / 2)
+                m1.connect(m2, color, style)
+                m1.draw(colP, mark)
+                m2.draw(colP, mark)
+            elif soort == 'ROLB':
+                m1 = hoekpunten[0].plus(hoekpunten[2]).times(1 / 2)
+                m2 = hoekpunten[1].plus(hoekpunten[3]).times(1 / 2)
+                m1.connect(m2, color, style)
+                m1.draw(colP, mark)
+                m2.draw(colP, mark)
+        elif lozSoort == 'Down':
+            if soort == 'LR':
+                m1 = hoekpunten[0].plus(hoekpunten[3]).times(1 / 2)
+                m2 = hoekpunten[1].plus(hoekpunten[2]).times(1 / 2)
+                m1.connect(m2, color, style)
+                m1.draw(colP, mark)
+                m2.draw(colP, mark)
+            elif soort == 'LORB':
+                m1 = hoekpunten[0].plus(hoekpunten[1]).times(1 / 2)
+                m2 = hoekpunten[2].plus(hoekpunten[3]).times(1 / 2)
+                m1.connect(m2, color, style)
+                m1.draw(colP, mark)
+                m2.draw(colP, mark)
+        elif lozSoort == 'Left':
+            if soort == 'ROLB':
+                m1 = hoekpunten[0].plus(hoekpunten[2]).times(1 / 2)
+                m2 = hoekpunten[1].plus(hoekpunten[3]).times(1 / 2)
+                m1.connect(m2, color, style)
+                m1.draw(colP, mark)
+                m2.draw(colP, mark)
+            elif soort == 'LORB':
+                m1 = hoekpunten[0].plus(hoekpunten[1]).times(1 / 2)
+                m2 = hoekpunten[2].plus(hoekpunten[3]).times(1 / 2)
+                m1.connect(m2, color, style)
+                m1.draw(colP, mark)
+                m2.draw(colP, mark)

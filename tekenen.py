@@ -158,9 +158,9 @@ def dimerOfTiling(length):
                 c.drawPoint()
     plt.axis('equal')
     plt.axis('off')
-    name = 'TilingAndDimers.png'
+    name = 'DimersOfTiling.png'
     plt.savefig(pad + name, bbox_inches='tight')
     plt.show()
 
 
-dimerOfTiling(3)
+dimersOnTiling(3)

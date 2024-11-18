@@ -245,3 +245,47 @@ def drawLozenges(lst):
 def drawDimes(lst):
     for loz in lst:
         loz.drawDime()
+
+
+def connectLevel(lst):
+    col = 'black'
+    style = '-'
+    for i in range(len(lst) - 1):
+        lst[i].connect(lst[i + 1], col, style)
+
+
+def drawPathGrid(zeshoek, soort):
+    n = zeshoek.getLength()
+    levels = []
+    col = 'black'
+    style = '-'
+    for i in range(2*n+1):
+        level = []
+        if i < n:
+            if soort == "LR":
+                for j in range(n+i):
+                    level.append(P.Point(((m.sqrt(3)/2)*(i-n), 0.5*(1-i-n)+j)))
+        elif soort == "LR":
+            for j in range(3*n-i):
+                level.append(P.Point(((m.sqrt(3) / 2) * (i-n), 0.5 * (1 + i - 3*n) + j)))
+        levels.append(level.copy())
+
+    for i in range(2*n):
+        if soort == "LR":
+            if i < n:
+                for j in range(n+i):
+                    levels[i][j].connect(levels[i+1][j], col, style)
+                    levels[i][j].connect(levels[i+1][j+1], col, style)
+            else:
+                for j in range(3*n-i):
+                    if j == 0:
+                        levels[i][j].connect(levels[i+1][j], col, style)
+                    elif j == 3*n-i-1:
+                        levels[i][j].connect(levels[i + 1][j-1], col, style)
+                    else:
+                        levels[i][j].connect(levels[i + 1][j], col, style)
+                        levels[i][j].connect(levels[i + 1][j - 1], col, style)
+
+    for level in levels:
+        for punt in level:
+            punt.draw("red", 'o')

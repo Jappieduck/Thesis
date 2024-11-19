@@ -2,10 +2,12 @@ import sympy as sp
 from sympy import latex
 
 
+# Transform sympy symbol expression to latex code
 def toLTX(expr):
     return latex(expr)
 
 
+# transform a sympy matrix to code for latex
 def writeMatrix(matrix):
     newstring = "\\begin{pmatrix}\n"
     n, m = sp.shape(matrix)

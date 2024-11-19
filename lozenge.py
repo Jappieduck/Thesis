@@ -1,19 +1,21 @@
 import triangle as T
-import centroid as C
-import matplotlib.pyplot as plt
 
 
+# A class for representing lozenge tiles
 class Lozenge:
+    # We define the lozenge by its black point and what kind of lozenge it is, type L1, L2 or L3 in the paper
     def __init__(self, beta, soort):
         self.base = beta
         self.soort = soort
 
+    # some getters
     def getSoort(self):
         return self.soort
 
     def getBase(self):
         return self.base
 
+    # calculate and return the black and white points of the lozenge
     def getCentroids(self):
         base = self.getBase()
         neighbours = base.getConnect()
@@ -27,6 +29,7 @@ class Lozenge:
             centroids.append(neighbours[0])
         return centroids
 
+    # Find and return the vertices of the lozenge
     def getVertices(self):
         centroids = self.getCentroids()
         soort = self.getSoort()
@@ -42,10 +45,12 @@ class Lozenge:
             vertBeta.append(vertAlpha[0])
         return vertBeta
 
+    # Draw the dimer corresponding to the lozenge tile
     def drawDime(self):
         centres = self.getCentroids()
         centres[0].connect(centres[1], 'red', '-')
 
+    # Draw the lozenge tile
     def draw(self):
         color = 'black'
         style = '-'
@@ -67,6 +72,7 @@ class Lozenge:
             vert[3].connect(vert[2], color, style)
             vert[2].connect(vert[0], color, style)
 
+    # Draw the path of the path system going through the lozenge, depending on what type of path construction used
     def drawPath(self, soort):
         color = 'red'
         colP = 'green'

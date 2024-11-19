@@ -3,12 +3,16 @@ import point as P
 import centroid as C
 
 
+# A class for representing a regular hexagon
 class Hexagon:
+    # we define the hexagon based on its center, if it is 'standing" or 'lying down',
+    # meaning two parallel lines being vertical respectively being horizontal, and the length of its sides
     def __init__(self, centrum, soort, length):
         self.centre = centrum
         self.soort = soort
         self.length = length
 
+    # Some getters
     def getCentre(self):
         return self.centre
 
@@ -18,6 +22,7 @@ class Hexagon:
     def getLength(self):
         return self.length
 
+    # calculate the vertices of the hexagon
     def getHoekpunten(self):
         B = P.Point((0, 1))
         O = P.Point((0, -1))
@@ -43,16 +48,9 @@ class Hexagon:
             p6 = c.plus(P.Point((m.cos(m.pi / 3), m.sin(m.pi / 3))).times(l))
         return [p1, p2, p3, p4, p5, p6]
 
+    # draw the hexagon the data represents
     def draw(self, color):
         vert = self.getHoekpunten()
         kleurpunten = []
         for i in range(len(vert)):
             vert[i].connect(vert[(i + 1) % 6], color, '-')
-        if self.getSoort() == 'Lying':
-            for i in range(len(vert)):
-                if i % 2 == 0:
-                    kleurpunten.append(C.Centroid((vert[i].getX(), vert[i].getY()), 'alpha'))
-                else:
-                    kleurpunten.append(C.Centroid((vert[i].getX(), vert[i].getY()), 'beta'))
-            for point in kleurpunten:
-                point.drawBase()

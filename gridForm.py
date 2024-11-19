@@ -5,11 +5,15 @@ import triangle as T
 import lozenge as L
 import random
 
+# Some constant that will be needed in several methods
 RB = P.Point((m.cos(m.pi / 6), m.sin(m.pi / 6)))
 LB = P.Point((-m.cos(m.pi / 6), m.sin(m.pi / 6)))
 B = P.Point((0, 1))
 
 
+# Here are some methods used to draw different grids or repeating structures and methods needed to do so
+
+# Finds how many points there are on each level of the bipartite graph, seen from left to right
 def rowNumbers(length):
     rows = []
     for i in range(length):
@@ -19,6 +23,7 @@ def rowNumbers(length):
     return rows
 
 
+# Get all the centroids inside a hexagon
 def get_Centroids(zeshoek):
     hoekenHexagon = zeshoek.getHoekpunten()
 
@@ -70,6 +75,7 @@ def get_Centroids(zeshoek):
     return centroidsBeta, centroidsAlpha
 
 
+# Fill a hexagon with triangles, and if needed also all the centroids
 def fillHexagon(zeshoek, center):
     hoekenHexagon = zeshoek.getHoekpunten()
     hoekenHexagon[0].connect(hoekenHexagon[3], 'gray', 'dashed')
@@ -86,6 +92,7 @@ def fillHexagon(zeshoek, center):
             c.drawPoint()
 
 
+# A method to sort the alpha and beta lists in the method drawBipartiteGraph
 def sorteer(lst, soort, lengte):
     rijen = []
     rows = rowNumbers(lengte)
@@ -101,6 +108,7 @@ def sorteer(lst, soort, lengte):
     return rijen
 
 
+# Draw the bipartite graph corresponding to a certain hexagon
 def drawBipartitGraph(zeshoek):
     beta, alpha = get_Centroids(zeshoek)
     alpha.remove(alpha[0])
@@ -133,12 +141,15 @@ def drawBipartitGraph(zeshoek):
         c.drawPoint()
 
 
+# check in a list of centroids if a certain centroid is connected inside that list
 def isConnected(punt, lst):
     for c in lst:
         if punt.equals(c):
             return c.getConnection()
 
 
+# Fill a hexagon randomly with lozenge tiles
+# REMARK: this does not follow the probability distribution we constructed in the paper
 def randomTiling(zeshoek):
     lozenges = []
     lengte = zeshoek.getLength()
@@ -230,6 +241,7 @@ def randomTiling(zeshoek):
     return alphaSorted[-1], lozenges
 
 
+# check if a tiling is a valid tiling
 def isValid(alphas):
     for alpha in alphas:
         if not alpha.getConnection():
@@ -237,51 +249,47 @@ def isValid(alphas):
     return True
 
 
+# draw a list of lozenges
 def drawLozenges(lst):
     for loz in lst:
         loz.draw()
 
 
+# draw a list of dimers
 def drawDimes(lst):
     for loz in lst:
         loz.drawDime()
 
 
-def connectLevel(lst):
-    col = 'black'
-    style = '-'
-    for i in range(len(lst) - 1):
-        lst[i].connect(lst[i + 1], col, style)
-
-
+# Draw the the grid induced by the path system construction
 def drawPathGrid(zeshoek, soort):
     n = zeshoek.getLength()
     levels = []
     col = 'black'
     style = '-'
-    for i in range(2*n+1):
+    for i in range(2 * n + 1):
         level = []
         if i < n:
             if soort == "LR":
-                for j in range(n+i):
-                    level.append(P.Point(((m.sqrt(3)/2)*(i-n), 0.5*(1-i-n)+j)))
+                for j in range(n + i):
+                    level.append(P.Point(((m.sqrt(3) / 2) * (i - n), 0.5 * (1 - i - n) + j)))
         elif soort == "LR":
-            for j in range(3*n-i):
-                level.append(P.Point(((m.sqrt(3) / 2) * (i-n), 0.5 * (1 + i - 3*n) + j)))
+            for j in range(3 * n - i):
+                level.append(P.Point(((m.sqrt(3) / 2) * (i - n), 0.5 * (1 + i - 3 * n) + j)))
         levels.append(level.copy())
 
-    for i in range(2*n):
+    for i in range(2 * n):
         if soort == "LR":
             if i < n:
-                for j in range(n+i):
-                    levels[i][j].connect(levels[i+1][j], col, style)
-                    levels[i][j].connect(levels[i+1][j+1], col, style)
+                for j in range(n + i):
+                    levels[i][j].connect(levels[i + 1][j], col, style)
+                    levels[i][j].connect(levels[i + 1][j + 1], col, style)
             else:
-                for j in range(3*n-i):
+                for j in range(3 * n - i):
                     if j == 0:
-                        levels[i][j].connect(levels[i+1][j], col, style)
-                    elif j == 3*n-i-1:
-                        levels[i][j].connect(levels[i + 1][j-1], col, style)
+                        levels[i][j].connect(levels[i + 1][j], col, style)
+                    elif j == 3 * n - i - 1:
+                        levels[i][j].connect(levels[i + 1][j - 1], col, style)
                     else:
                         levels[i][j].connect(levels[i + 1][j], col, style)
                         levels[i][j].connect(levels[i + 1][j - 1], col, style)

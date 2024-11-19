@@ -145,15 +145,15 @@ def dimerOfTiling(length):
 
 
 # Draw the grid cooresponding to a certain path system construction on top of a hexagon with it triangular grid
-def pathGrid(length):
+def pathGrid(length, soort, weight):
     zeshoek = H.Hexagon(O, 'Standing', length)
     D.fillHexagon(zeshoek, False)
     zeshoek.draw('gray')
-    soort = "LR"
-    D.drawPathGrid(zeshoek, soort)
+    name = "padSystemGraph" + soort
+    if weight:
+        name = name + "WithWeightIndication"
+    D.drawPathGrid(zeshoek, soort, weight)
     plt.axis('equal')
     plt.axis('off')
+    plt.savefig(pad + name, bbox_inches='tight')
     plt.show()
-
-
-pathGrid(4)

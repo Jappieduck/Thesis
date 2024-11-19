@@ -262,38 +262,82 @@ def drawDimes(lst):
 
 
 # Draw the the grid induced by the path system construction
-def drawPathGrid(zeshoek, soort):
+def drawPathGrid(zeshoek, soort, weight):
     n = zeshoek.getLength()
     levels = []
     col = 'black'
+    colW1 = 'blue'
+    colW2 = 'green'
     style = '-'
+    v1 = P.Point((m.sqrt(3)/2, -0.5))
+    v2 = P.Point((-m.sqrt(3)/2, -0.5))
+    up = P.Point((0, 1))
+    a0 = P.Point((0,0))
+    z0 = P.Point((0,0))
+    if soort == "LR":
+        a0 = a0.plus(up.times(0.5).plus(v2.times(n)))
+        z0 = z0.plus(up.times(0.5).plus(v1.times(n)))
+    elif soort == "ROLB":
+        a0 = a0.plus(v2.times(0.5).plus(v1.times(n)))
+        z0 = z0.plus(v2.times(0.5).plus(up.times(n)))
+    elif soort == "LORB":
+        a0 = a0.plus(v1.times(0.5).plus(up.times(n)))
+        z0 = z0.plus(v1.times(0.5).plus(v2.times(n)))
     for i in range(2 * n + 1):
         level = []
         if i < n:
             if soort == "LR":
                 for j in range(n + i):
-                    level.append(P.Point(((m.sqrt(3) / 2) * (i - n), 0.5 * (1 - i - n) + j)))
+                    level.append(a0.plus(v1.times(i)).plus(up.times(j)))
+            elif soort == "ROLB":
+                for j in range(n + i):
+                    level.append(a0.plus(up.times(i)).plus(v2.times(j)))
+            elif soort == "LORB":
+                for j in range(n + i):
+                    level.append(a0.plus(v2.times(i)).plus(v1.times(j)))
         elif soort == "LR":
             for j in range(3 * n - i):
-                level.append(P.Point(((m.sqrt(3) / 2) * (i - n), 0.5 * (1 + i - 3 * n) + j)))
+                level.append(z0.plus(v2.times(2*n-i)).plus(up.times(j)))
+        elif soort == "LORB":
+            for j in range(3 * n - i):
+                level.append(z0.plus(up.times(2*n-i)).plus(v1.times(j)))
+        elif soort == "ROLB":
+            for j in range(3 * n - i):
+                level.append(z0.plus(v1.times(2*n-i)).plus(v2.times(j)))
         levels.append(level.copy())
 
     for i in range(2 * n):
-        if soort == "LR":
-            if i < n:
-                for j in range(n + i):
+        if i < n:
+            for j in range(n + i):
+                if weight:
+                    levels[i][j].connect(levels[i + 1][j], colW1, style)
+                    levels[i][j].connect(levels[i + 1][j + 1], colW2, style)
+                else:
                     levels[i][j].connect(levels[i + 1][j], col, style)
                     levels[i][j].connect(levels[i + 1][j + 1], col, style)
-            else:
-                for j in range(3 * n - i):
-                    if j == 0:
+        else:
+            for j in range(3 * n - i):
+                if j == 0:
+                    if weight:
+                        levels[i][j].connect(levels[i + 1][j], colW2, style)
+                    else:
                         levels[i][j].connect(levels[i + 1][j], col, style)
-                    elif j == 3 * n - i - 1:
+                elif j == 3 * n - i - 1:
+                    if weight:
+                        levels[i][j].connect(levels[i + 1][j - 1], colW1, style)
+                    else:
                         levels[i][j].connect(levels[i + 1][j - 1], col, style)
+                else:
+                    if weight:
+                        levels[i][j].connect(levels[i + 1][j], colW2, style)
+                        levels[i][j].connect(levels[i + 1][j - 1], colW1, style)
                     else:
                         levels[i][j].connect(levels[i + 1][j], col, style)
                         levels[i][j].connect(levels[i + 1][j - 1], col, style)
 
     for level in levels:
         for punt in level:
-            punt.draw("red", 'o')
+            if weight:
+                punt.draw(col, 'o')
+            else:
+                punt.draw("red", 'o')

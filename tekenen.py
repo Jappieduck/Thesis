@@ -6,13 +6,14 @@ import hexagon as H
 
 # Some constant, namely the origin and where to save figures. I changed it
 O = P.Point((0, 0))
-pad = 'Insert Path where you want to export your figures to'
+# pad = 'Insert Path where you want to export your figures to'
+pad = r'D:\School\2de jaar Master\Thesis\LaTeX\Klad\Bewijzen\\'
 
 
 # Draw the triangular grid inside a hexagon, and the black and white centroids if wanted
 # centers is a boolean here
 def gridInHexagon(length, centers):
-    zeshoek = H.Hexagon(O, 'Standing', length)
+    zeshoek = H.Hexagon(O, length)
     D.fillHexagon(zeshoek, centers)
     plt.axis('equal')
     plt.axis('off')
@@ -23,7 +24,7 @@ def gridInHexagon(length, centers):
 
 # Draw the bipartite graph
 def bipartiteGraph(length):
-    zeshoek = H.Hexagon(O, 'Standing', length)
+    zeshoek = H.Hexagon(O, length)
     D.drawBipartitGraph(zeshoek)
     plt.axis('equal')
     plt.axis('off')
@@ -32,21 +33,10 @@ def bipartiteGraph(length):
     plt.show()
 
 
-# Getting a valid random tiling to be used in other methods
-def getTiling(length):
-    valid = False
-    while not valid:
-        zeshoek = H.Hexagon(O, 'Standing', length)
-        lastAlpha, lozenges = D.randomTiling(zeshoek)
-        if not valid:
-            plt.clf()
-        else:
-            return zeshoek, lastAlpha, lozenges
-
-
 # Draw a random dimer model
 def randomDimes(length):
-    zeshoek, lastalpha, lozenges = getTiling(length)
+    zeshoek = H.Hexagon(O, length)
+    lozenges = D.randomTiling(zeshoek)
     D.drawBipartitGraph(zeshoek)
     D.drawDimes(lozenges)
     beta, alpha = D.get_Centroids(zeshoek)
@@ -63,7 +53,8 @@ def randomDimes(length):
 
 # draw a random tiling
 def randomTiles(length):
-    zeshoek, lastAlpha, lozenges = getTiling(length)
+    zeshoek = H.Hexagon(O, length)
+    lozenges = D.randomTiling(zeshoek)
     plt.axis('equal')
     plt.axis('off')
     if length == 1:
@@ -82,7 +73,8 @@ def randomTiles(length):
 
 # draw the dimer model of a random tiling on top of that random tiling
 def dimersOnTiling(length):
-    zeshoek, lastAlpha, lozenges = getTiling(length)
+    zeshoek = H.Hexagon(O, length)
+    lozenges = D.randomTiling(zeshoek)
     D.drawBipartitGraph(zeshoek)
     D.drawLozenges(lozenges)
     D.drawDimes(lozenges)
@@ -116,7 +108,8 @@ def drawVert():
 
 # Draw the path system of a certain construction on top of random tiling
 def plotPathSystem(length, construct):
-    zeshoek, lastAlpha, lozenges = getTiling(length)
+    zeshoek = H.Hexagon(O, length)
+    lozenges = D.randomTiling(zeshoek)
     D.drawLozenges(lozenges)
     for loz in lozenges:
         loz.drawPath(construct)
@@ -129,7 +122,8 @@ def plotPathSystem(length, construct):
 
 # Draw the dimers of the tiles of a random tiling
 def dimerOfTiling(length):
-    zeshoek, lasatAlpha, lozenges = getTiling(length)
+    zeshoek = H.Hexagon(O, length)
+    lozenges = D.randomTiling(zeshoek)
     D.drawLozenges(lozenges)
     D.drawDimes(lozenges)
     beta, alpha = D.get_Centroids(zeshoek)
@@ -146,14 +140,16 @@ def dimerOfTiling(length):
 
 # Draw the grid cooresponding to a certain path system construction on top of a hexagon with it triangular grid
 def pathGrid(length, soort, weight):
-    zeshoek = H.Hexagon(O, 'Standing', length)
+    zeshoek = H.Hexagon(O, length)
     D.fillHexagon(zeshoek, False)
     zeshoek.draw('gray')
     name = "padSystemGraph" + soort
     if weight:
-        name = name + "WithWeightIndication"
+        name = name + "WithWeightIndication" + weight
     D.drawPathGrid(zeshoek, soort, weight)
     plt.axis('equal')
     plt.axis('off')
     plt.savefig(pad + name, bbox_inches='tight')
     plt.show()
+
+

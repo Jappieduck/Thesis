@@ -1,53 +1,51 @@
-import triangle as T
+import math as m
+import matplotlib.pyplot as plt
+
+import point as P
 
 
 # A class for representing lozenge tiles
 class Lozenge:
     # We define the lozenge by its black point and what kind of lozenge it is, type L1, L2 or L3 in the paper
-    def __init__(self, beta, soort):
-        self.base = beta
-        self.soort = soort
+    def __init__(self, beta, alpha):
+        self.beta = beta
+        self.alpha = alpha
 
     # some getters
-    def getSoort(self):
-        return self.soort
+    def getBeta(self):
+        return self.beta
 
-    def getBase(self):
-        return self.base
-
-    # calculate and return the black and white points of the lozenge
-    def getCentroids(self):
-        base = self.getBase()
-        neighbours = base.getConnect()
-        soort = self.getSoort()
-        centroids = [base]
-        if soort == 'Up':
-            centroids.append(neighbours[1])
-        elif soort == 'Down':
-            centroids.append(neighbours[2])
-        else:
-            centroids.append(neighbours[0])
-        return centroids
+    def getAlpha(self):
+        return self.alpha
 
     # Find and return the vertices of the lozenge
     def getVertices(self):
-        centroids = self.getCentroids()
-        soort = self.getSoort()
-        driehoekBeta = T.Triangle(centroids[0], 'beta')
-        driehoekAlpha = T.Triangle(centroids[1], 'alpha')
-        vertBeta = driehoekBeta.getVertices()
-        vertAlpha = driehoekAlpha.getVertices()
-        if soort == 'Up':
-            vertBeta.append(vertAlpha[1])
-        if soort == 'Down':
-            vertBeta.append(vertAlpha[2])
-        elif soort == 'Left':
-            vertBeta.append(vertAlpha[0])
-        return vertBeta
+        a = P.Point((m.sqrt(3) / 3, 0))
+        b = P.Point((-m.sqrt(3) / 6, 0.5))
+        c = P.Point((-m.sqrt(3) / 6, -0.5))
+        black = self.getBeta()
+        white = self.getAlpha()
+        vert = []
+        if white.getX() < black.getX():
+            vert.append(black.plus(b))
+            vert.append(black.plus(a))
+            vert.append(black.plus(c))
+            vert.append(white.plus(a.times(-1)))
+        elif black.getY() < white.getY():
+            vert.append(white.plus(a.times(-1)))
+            vert.append(white.plus(c.times(-1)))
+            vert.append(white.plus(b.times(-1)))
+            vert.append(black.plus(c))
+        elif black.getY() > white.getY():
+            vert.append(black.plus(a))
+            vert.append(white.plus(b.times(-1)))
+            vert.append(white.plus(a.times(-1)))
+            vert.append(black.plus(b))
+        return vert
 
     # Draw the dimer corresponding to the lozenge tile
     def drawDime(self):
-        centres = self.getCentroids()
+        centres = [self.getBeta(), self.getAlpha()]
         centres[0].connect(centres[1], 'red', '-')
 
     # Draw the lozenge tile
@@ -55,22 +53,8 @@ class Lozenge:
         color = 'black'
         style = '-'
         vert = self.getVertices()
-        soort = self.getSoort()
-        if soort == 'Up':
-            vert[0].connect(vert[2], color, style)
-            vert[2].connect(vert[1], color, style)
-            vert[1].connect(vert[3], color, style)
-            vert[3].connect(vert[0], color, style)
-        elif soort == 'Down':
-            vert[0].connect(vert[1], color, style)
-            vert[1].connect(vert[2], color, style)
-            vert[2].connect(vert[3], color, style)
-            vert[3].connect(vert[0], color, style)
-        elif soort == 'Left':
-            vert[0].connect(vert[1], color, style)
-            vert[1].connect(vert[3], color, style)
-            vert[3].connect(vert[2], color, style)
-            vert[2].connect(vert[0], color, style)
+        for i in range(4):
+            vert[i].connect(vert[(i + 1) % 4], color, style)
 
     # Draw the path of the path system going through the lozenge, depending on what type of path construction used
     def drawPath(self, soort):
@@ -78,7 +62,13 @@ class Lozenge:
         colP = 'green'
         style = '-'
         mark = 'o'
-        lozSoort = self.getSoort()
+        lozSoort = 'Down'
+        beta = self.getBeta()
+        alpha = self.getAlpha()
+        if beta.getY() < alpha.getY():
+            lozSoort = 'Up'
+        if alpha.getX() < beta.getX():
+            lozSoort = 'Left'
         hoekpunten = self.getVertices()
         if lozSoort == 'Up':
             if soort == 'LR':
@@ -119,3 +109,4 @@ class Lozenge:
                 m1.connect(m2, color, style)
                 m1.draw(colP, mark)
                 m2.draw(colP, mark)
+

@@ -12,67 +12,46 @@ B = P.Point((0, 1))
 
 
 # Here are some methods used to draw different grids or repeating structures and methods needed to do so
-
-# Finds how many points there are on each level of the bipartite graph, seen from left to right
-def rowNumbers(length):
-    rows = []
-    for i in range(length):
-        rows.append(length + i)
-    for i in range(length, 0, -1):
-        rows.append(length + i)
-    return rows
-
-
-# Get all the centroids inside a hexagon
 def get_Centroids(zeshoek):
-    hoekenHexagon = zeshoek.getHoekpunten()
-
-    c1 = hoekenHexagon[4]
-    b1 = c1.plus(B)
-    a1 = c1.plus(RB)
-    P1 = a1.plus(b1).plus(c1).times(1 / 3)
-    M1 = C.Centroid((P1.getX(), P1.getY()), 'beta')
-
-    c2 = hoekenHexagon[2]
-    b2 = c2.plus(B)
-    a2 = c2.plus(LB)
-    P2 = a2.plus(b2).plus(c2).times(1 / 3)
-    M2 = C.Centroid((P2.getX(), P2.getY()), 'alpha')
-
-    centroidsBeta = [M1]
-    centroidsAlpha = [M2]
-    rows = rowNumbers(zeshoek.getLength())
-    ascending = True
-    maximum = max(rows)
-    for i in rows:
-        if i == 0:
-            for j in range(1, i):
-                P1 = M1.plus(P.Point((0, j)))
-                P2 = M2.plus(P.Point((0, j)))
-                centroidsBeta.append(C.Centroid((P1.getX(), P1.getY()), 'beta'))
-                centroidsAlpha.append(C.Centroid((P2.getX(), P2.getY()), 'alpha'))
-            M1 = M1.plus(P.Point((m.cos(m.pi / 6), -m.sin(m.pi / 6))))
-            M2 = M2.plus(P.Point((-m.cos(m.pi / 6), -m.sin(m.pi / 6))))
-        else:
-            if i == maximum:
-                ascending = False
-            if ascending:
-                for j in range(i):
-                    P1 = M1.plus(P.Point((0, j)))
-                    P2 = M2.plus(P.Point((0, j)))
-                    centroidsBeta.append(C.Centroid((P1.getX(), P1.getY()), 'beta'))
-                    centroidsAlpha.append(C.Centroid((P2.getX(), P2.getY()), 'alpha'))
-                M1 = M1.plus(P.Point((m.sqrt(3) / 2, -1 / 2)))
-                M2 = M2.plus(P.Point((-m.sqrt(3) / 2, -1 / 2)))
-            else:
-                for j in range(i):
-                    P1 = M1.plus(P.Point((0, j)))
-                    P2 = M2.plus(P.Point((0, j)))
-                    centroidsBeta.append(C.Centroid((P1.getX(), P1.getY()), 'beta'))
-                    centroidsAlpha.append(C.Centroid((P2.getX(), P2.getY()), 'alpha'))
-                M1 = M1.plus(P.Point((m.sqrt(3) / 2, 1 / 2)))
-                M2 = M2.plus(P.Point((-m.sqrt(3) / 2, 1 / 2)))
-    return centroidsBeta, centroidsAlpha
+    black = []
+    white = []
+    v1 = P.Point((m.sqrt(3) / 2, -0.5))
+    v2 = P.Point((-m.sqrt(3) / 2, -0.5))
+    up = P.Point((0, 1))
+    n = zeshoek.getLength()
+    for i in range(n):
+        colB = []
+        colW = []
+        for j in range(n + i):
+            b = v2.times(n - 1).plus(P.Point((-m.sqrt(3) / 3, 0))).plus(up.times(j)).plus(v1.times(i))
+            b = C.Centroid((b.getX(), b.getY()), 'beta')
+            colB.append(b)
+            if i > 0:
+                w = b.plus(P.Point((-m.sqrt(3) / 3, 0)))
+                w = C.Centroid((w.getX(), w.getY()), 'alpha')
+                colW.append(w)
+        black.append(colB)
+        if len(colW) > 0:
+            white.append(colW)
+    for i in range(n - 1, 2 * n - 1):
+        colB = []
+        colW = []
+        for j in range(3 * n - i - 1):
+            b = v1.times(n).plus(up.times(j)).plus(v2.times(2 * n - i - 2)).plus(P.Point((-m.sqrt(3) / 3, 0)))
+            b = C.Centroid((b.getX(), b.getY()), 'beta')
+            colB.append(b)
+            w = b.plus(P.Point((-m.sqrt(3) / 3, 0)))
+            w = C.Centroid((w.getX(), w.getY()), 'alpha')
+            colW.append(w)
+        black.append(colB)
+        white.append(colW)
+    colW = []
+    for j in range(n):
+        w = v1.times(n - 1).plus(up.times(j)).plus(P.Point((m.sqrt(3) / 3, 0)))
+        w = C.Centroid((w.getX(), w.getY()), 'alpha')
+        colW.append(w)
+    white.append(colW)
+    return black, white
 
 
 # Fill a hexagon with triangles, and if needed also all the centroids
@@ -80,65 +59,53 @@ def fillHexagon(zeshoek, center):
     hoekenHexagon = zeshoek.getHoekpunten()
     hoekenHexagon[0].connect(hoekenHexagon[3], 'gray', 'dashed')
     beta, alpha = get_Centroids(zeshoek)
-    for c in beta:
-        punt = P.Point((c.getX(), c.getY()))
-        driehoek = T.Triangle(punt, c.getSoort())
-        driehoek.draw('gray', 'dashed')
+    for col in beta:
+        for c in col:
+            punt = P.Point((c.getX(), c.getY()))
+            driehoek = T.Triangle(punt, c.getSoort())
+            driehoek.draw('gray', 'dashed')
+            if center:
+                c.drawPoint()
+        zeshoek.draw('black')
         if center:
-            c.drawPoint()
-    zeshoek.draw('black')
-    if center:
-        for c in alpha:
-            c.drawPoint()
-
-
-# A method to sort the alpha and beta lists in the method drawBipartiteGraph
-def sorteer(lst, soort, lengte):
-    rijen = []
-    rows = rowNumbers(lengte)
-    begin = 0
-    for val in rows:
-        newlst = []
-        for i in range(begin, begin + val):
-            newlst.append(lst[i])
-        rijen.append(newlst[:])
-        begin = begin + val
-    if soort == 'alpha':
-        rijen.reverse()
-    return rijen
+            for col in alpha:
+                for c in col:
+                    c.drawPoint()
 
 
 # Draw the bipartite graph corresponding to a certain hexagon
 def drawBipartitGraph(zeshoek):
     beta, alpha = get_Centroids(zeshoek)
-    alpha.remove(alpha[0])
-    beta.remove(beta[0])
     l = zeshoek.getLength()
-    betaSorted = sorteer(beta, 'beta', l)
-    alphaSorted = sorteer(alpha, 'alpha', l)
-    for row in alphaSorted:
+    for row in alpha:
         for point in row:
             point.drawPoint()
     color = 'black'
     soort = '-'
-    for i in range(len(betaSorted)):
-        if i < l:
-            for j in range(len(betaSorted[i])):
-                betaSorted[i][j].connect(alphaSorted[i][j], color, soort)
-                betaSorted[i][j].connect(alphaSorted[i][j + 1], color, soort)
-                if i > 0:
-                    betaSorted[i][j].connect(alphaSorted[i - 1][j], color, soort)
-        else:
-            for j in range(len(betaSorted[i])):
-                betaSorted[i][j].connect(alphaSorted[i - 1][j], color, soort)
-                if j != 0:
-                    betaSorted[i][j].connect(alphaSorted[i][j - 1], color, soort)
-                if j != len(betaSorted[i]) - 1:
-                    betaSorted[i][j].connect(alphaSorted[i][j], color, soort)
-    for c in beta:
-        c.drawPoint()
-    for c in alpha:
-        c.drawPoint()
+    for i in range(l):
+        for j in range(len(beta[i])):
+            beta[i][j].connect(alpha[i][j], color, soort)
+            beta[i][j].connect(alpha[i][j + 1], color, soort)
+            if i > 0:
+                beta[i][j].connect(alpha[i - 1][j], color, soort)
+    for i in range(l, 2 * l):
+        for j in range(len(beta[i])):
+            if j == 0:
+                beta[i][j].connect(alpha[i][j], color, soort)
+                beta[i][j].connect(alpha[i - 1][j], color, soort)
+            elif j == len(beta[i]) - 1:
+                beta[i][j].connect(alpha[i][j - 1], color, soort)
+                beta[i][j].connect(alpha[i - 1][j], color, soort)
+            else:
+                beta[i][j].connect(alpha[i][j], color, soort)
+                beta[i][j].connect(alpha[i][j - 1], color, soort)
+                beta[i][j].connect(alpha[i - 1][j], color, soort)
+    for col in beta:
+        for c in col:
+            c.drawPoint()
+    for col in alpha:
+        for c in col:
+            c.drawPoint()
 
 
 # check in a list of centroids if a certain centroid is connected inside that list
@@ -148,105 +115,53 @@ def isConnected(punt, lst):
             return c.getConnection()
 
 
+def getPossibilities(count, n, alpha, i, j):
+    poss = []
+    if i < n:
+        if not alpha[i][j].getConnection():
+            poss.append(alpha[i][j])
+        if not alpha[i][j + 1].getConnection():
+            poss.append(alpha[i][j + 1])
+    else:
+        if j == 0:
+            poss.append(alpha[i][j])
+        elif j == len(alpha[i]) + 1:
+            poss.append(alpha[i][j - 1])
+        else:
+            if not alpha[i][j - 1].getConnection():
+                poss.append(alpha[i][j - 1])
+            if n - count < len(alpha[i]) - j:
+                poss.append(alpha[i][j])
+    return poss
+
+
 # Fill a hexagon randomly with lozenge tiles
 # REMARK: this does not follow the probability distribution we constructed in the paper
 def randomTiling(zeshoek):
     lozenges = []
-    lengte = zeshoek.getLength()
+    n = zeshoek.getLength()
     beta, alpha = get_Centroids(zeshoek)
-    beta.remove(beta[0])
-    alpha.remove(alpha[0])
-    betaSorted = sorteer(beta, 'beta', lengte)
-    alphaSorted = sorteer(alpha, 'alpha', lengte)
-    for i in range(len(betaSorted) - 1):
-        if i >= lengte:
-            if not betaSorted[i][len(betaSorted[i]) - 1].getConnection():
-                betaSorted[i][-1].setConnection(True)
-                alphaSorted[i][-1].setConnection(True)
-                lozenges.append(L.Lozenge(betaSorted[i][-1], 'Down'))
-        for j in range(len(betaSorted[i])):
-            c = betaSorted[i][j]
-            if not c.getConnection():
-                p = random.uniform(0, 1)
-                kansen = [p, 1 - p]
-                buren = []
-                left = [None, 'Left']
-                top = [None, 'Up']
-                bottom = [None, 'Down']
-                if i > 0:
-                    left[0] = alphaSorted[i - 1][j]
-                if i < lengte:
-                    top[0] = alphaSorted[i][j + 1]
-                    bottom[0] = alphaSorted[i][j]
+    for p in beta[0]:
+        p.setConnection(True)
+    for i in range(len(beta)):
+        count = 0
+        for j in range(len(beta[i])):
+            if i == 0 or alpha[i - 1][j].getConnection():
+                count += 1
+                pos = getPossibilities(count, n, alpha, i, j)
+                if len(pos) == 1:
+                    pos[0].setConnection(True)
+                    lozenges.append(L.Lozenge(beta[i][j], pos[0]))
                 else:
-                    if j == 0:
-                        top[0] = alphaSorted[i][j]
-                        bottom[0] = None
-                    elif j < len(betaSorted[i]) - 1:
-                        bottom[0] = alphaSorted[i][j - 1]
-                        top[0] = alphaSorted[i][j]
-                    else:
-                        bottom[0] = alphaSorted[i][j + 1]
-                        top[0] = None
-                if top[0] is not None:
-                    buren.append(top)
-                if bottom[0] is not None:
-                    buren.append(bottom)
-                if len(buren) == 1:
-                    lozenges.append(L.Lozenge(c, buren[0][1]))
-                    buren[0][0].setConnection(True)
-                    c.setConnection(True)
-                elif len(buren) > 1:
-                    if isConnected(buren[0][0], alpha):
-                        buren[1][0].setConnection(True)
-                        c.setConnection(True)
-                        lozenges.append(L.Lozenge(c, buren[1][1]))
-                    elif isConnected(buren[1][0], alpha):
-                        buren[0][0].setConnection(True)
-                        c.setConnection(True)
-                        lozenges.append(L.Lozenge(c, buren[0][1]))
-                    else:
-                        keuze = random.choices(buren, kansen)
-                        punt = keuze[0]
-                        punt[0].setConnection(True)
-                        c.setConnection(True)
-                        lozenges.append(L.Lozenge(c, punt[1]))
-        for j in range(len(alphaSorted[i])):
-            punt = alphaSorted[i][j]
-            if not punt.getConnection():
-                punt.setConnection(True)
-                betaSorted[i + 1][j].setConnection(True)
-                lozenges.append(L.Lozenge(betaSorted[i + 1][j], 'Left'))
-    up = True
-    for j in range(len(betaSorted[-1])):
-        newUp = up
-        c = betaSorted[-1][j]
-        if c.getConnection():
-            newUp = not up
-        if newUp == up:
-            if newUp:
-                if j == len(betaSorted[-1]) - 1:
-                    c.setConnection(True)
-                    alphaSorted[-1][j - 1].setConnection(True)
-                    lozenges.append(L.Lozenge(c, 'Down'))
-                else:
-                    c.setConnection(True)
-                    alphaSorted[-1][j].setConnection(True)
-                    lozenges.append(L.Lozenge(c, 'Up'))
-            else:
-                c.setConnection(True)
-                alphaSorted[-1][j - 1].setConnection(True)
-                lozenges.append(L.Lozenge(c, 'Down'))
-        up = newUp
-    return alphaSorted[-1], lozenges
-
-
-# check if a tiling is a valid tiling
-def isValid(alphas):
-    for alpha in alphas:
-        if not alpha.getConnection():
-            return False
-    return True
+                    p = random.uniform(0, 1)
+                    kansen = [p, 1 - p]
+                    keuze = random.choices(pos, kansen)[0]
+                    keuze.setConnection(True)
+                    lozenges.append(L.Lozenge(beta[i][j], keuze))
+        for j in range(len(alpha[i])):
+            if not alpha[i][j].getConnection():
+                lozenges.append(L.Lozenge(beta[i + 1][j], alpha[i][j]))
+    return lozenges
 
 
 # draw a list of lozenges
@@ -261,7 +176,7 @@ def drawDimes(lst):
         loz.drawDime()
 
 
-# Draw the the grid induced by the path system construction
+# Draw the grid induced by the path system construction
 def drawPathGrid(zeshoek, soort, weight):
     n = zeshoek.getLength()
     levels = []
@@ -269,11 +184,11 @@ def drawPathGrid(zeshoek, soort, weight):
     colW1 = 'blue'
     colW2 = 'green'
     style = '-'
-    v1 = P.Point((m.sqrt(3)/2, -0.5))
-    v2 = P.Point((-m.sqrt(3)/2, -0.5))
+    v1 = P.Point((m.sqrt(3) / 2, -0.5))
+    v2 = P.Point((-m.sqrt(3) / 2, -0.5))
     up = P.Point((0, 1))
-    a0 = P.Point((0,0))
-    z0 = P.Point((0,0))
+    a0 = P.Point((0, 0))
+    z0 = P.Point((0, 0))
     if soort == "LR":
         a0 = a0.plus(up.times(0.5).plus(v2.times(n)))
         z0 = z0.plus(up.times(0.5).plus(v1.times(n)))
@@ -297,13 +212,13 @@ def drawPathGrid(zeshoek, soort, weight):
                     level.append(a0.plus(v2.times(i)).plus(v1.times(j)))
         elif soort == "LR":
             for j in range(3 * n - i):
-                level.append(z0.plus(v2.times(2*n-i)).plus(up.times(j)))
+                level.append(z0.plus(v2.times(2 * n - i)).plus(up.times(j)))
         elif soort == "LORB":
             for j in range(3 * n - i):
-                level.append(z0.plus(up.times(2*n-i)).plus(v1.times(j)))
+                level.append(z0.plus(up.times(2 * n - i)).plus(v1.times(j)))
         elif soort == "ROLB":
             for j in range(3 * n - i):
-                level.append(z0.plus(v1.times(2*n-i)).plus(v2.times(j)))
+                level.append(z0.plus(v1.times(2 * n - i)).plus(v2.times(j)))
         levels.append(level.copy())
 
     for i in range(2 * n):

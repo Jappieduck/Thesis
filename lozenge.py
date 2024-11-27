@@ -109,4 +109,3 @@ class Lozenge:
                 m1.connect(m2, color, style)
                 m1.draw(colP, mark)
                 m2.draw(colP, mark)
-

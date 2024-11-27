@@ -1,6 +1,4 @@
 import math as m
-import matplotlib.pyplot as plt
-
 import point as P
 
 

@@ -1,6 +1,5 @@
 import math as m
 import point as P
-import centroid as C
 
 
 # A class for representing a regular hexagon

@@ -1,11 +1,9 @@
 import math as m
 import centroid as C
-import hexagon
 import point as P
 import triangle as T
 import lozenge as L
 import random
-import matplotlib.pyplot as plt
 
 # Some constant that will be needed in several methods
 RB = P.Point((m.cos(m.pi / 6), m.sin(m.pi / 6)))

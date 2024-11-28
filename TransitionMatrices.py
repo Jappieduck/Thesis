@@ -58,11 +58,11 @@ def T(m, var, soort):
     matrix = sp.zeros(n, n)
     for k in range(0, n):
         if k != n - 1:
-            matrix[k, k] = ai(soort, (m-1, k))
-            matrix[k, (k + 1) % n] = bi(soort, (m-1, k))
+            matrix[k, k] = ai(soort, (m - 1, k))
+            matrix[k, (k + 1) % n] = bi(soort, (m - 1, k))
         else:
-            matrix[k, k] = ai(soort, (m-1, k))
-            matrix[k, (k + 1) % n] = bi(soort, (m-1, k)) * var
+            matrix[k, k] = ai(soort, (m - 1, k))
+            matrix[k, (k + 1) % n] = bi(soort, (m - 1, k)) * var
     return matrix
 
 
@@ -73,3 +73,48 @@ def W(var, soort):
     return W
 
 
+def checkCondition1():
+    for l in range(1, 4):
+        print('Soort (' + str(l) + ')')
+        print('\\begin{equation*}')
+        print('    \\begin{split}')
+        for k in range(r):
+            if k != r - 1:
+                print('        j = ' + str(k) + '&: ' + LTX.toLTX(ai(l, (0, k)) * ai(l, (1, k)) * ai(l, (2, k))) + "\\\\")
+            else:
+                print('        j = ' + str(k) + '&: ' + LTX.toLTX(ai(l, (0, k)) * ai(l, (1, k)) * ai(l, (2, k))))
+        print('    \\end{split}')
+        print('\\end{equation*}')
+
+
+def checkCondition2():
+    for l in range(1, 4):
+        print('Soort (' + str(l) + ')')
+        print('\\begin{equation*}')
+        print('    \\begin{split}')
+        for k in range(r):
+            if k != r - 1:
+                print('        &' + LTX.toLTX(
+                    bi(l, (0, k % r)) * bi(l, (1, (1 + k) % r)) * bi(l, (2, (2 + k) % r))) + "\\\\")
+            else:
+                print('        &' + LTX.toLTX(bi(l, (0, k % r)) * bi(l, (1, (1 + k) % r)) * bi(l, (2, (2 + k) % r))))
+        print('    \\end{split}')
+        print('\\end{equation*}')
+
+
+def checkCondition3():
+    for l in range(1, 4):
+        print('Soort (' + str(l) + ')')
+        print('\\begin{equation*}')
+        print('    \\begin{split}')
+        for k in range(r):
+            if k != r - 1:
+                print('        k = ' + str(k) + '&: ' + LTX.toLTX(
+                    (ai(l, (k, 1)) * ai(l, (k, 2)) * ai(l, (k, 3))) / (
+                                bi(l, (k, 1)) * bi(l, (k, 2)) * bi(l, (k, 3)))) + "\\\\")
+            else:
+                print('        k = ' + str(k) + '&: ' + LTX.toLTX(
+                    (ai(l, (k, 1)) * ai(l, (k, 2)) * ai(l, (k, 3))) / (
+                            bi(l, (k, 1)) * bi(l, (k, 2)) * bi(l, (k, 3)))))
+        print('    \\end{split}')
+        print('\\end{equation*}')

@@ -76,19 +76,19 @@ class Lozenge:
                 m1.draw(colP, mark)
                 m2.draw(colP, mark)
             elif soort == 'ROLB':
-                m1 = hoekpunten[0].plus(hoekpunten[2]).times(1 / 2)
-                m2 = hoekpunten[1].plus(hoekpunten[3]).times(1 / 2)
+                m1 = hoekpunten[0].plus(hoekpunten[1]).times(1 / 2)
+                m2 = hoekpunten[2].plus(hoekpunten[3]).times(1 / 2)
                 m1.connect(m2, color, style)
                 m1.draw(colP, mark)
                 m2.draw(colP, mark)
         elif lozSoort == 'Down':
-            if soort == 'LR':
+            if soort == 'LORB':
                 m1 = hoekpunten[0].plus(hoekpunten[3]).times(1 / 2)
                 m2 = hoekpunten[1].plus(hoekpunten[2]).times(1 / 2)
                 m1.connect(m2, color, style)
                 m1.draw(colP, mark)
                 m2.draw(colP, mark)
-            elif soort == 'LORB':
+            elif soort == 'LR':
                 m1 = hoekpunten[0].plus(hoekpunten[1]).times(1 / 2)
                 m2 = hoekpunten[2].plus(hoekpunten[3]).times(1 / 2)
                 m1.connect(m2, color, style)
@@ -96,8 +96,8 @@ class Lozenge:
                 m2.draw(colP, mark)
         elif lozSoort == 'Left':
             if soort == 'ROLB':
-                m1 = hoekpunten[0].plus(hoekpunten[2]).times(1 / 2)
-                m2 = hoekpunten[1].plus(hoekpunten[3]).times(1 / 2)
+                m1 = hoekpunten[0].plus(hoekpunten[3]).times(1 / 2)
+                m2 = hoekpunten[1].plus(hoekpunten[2]).times(1 / 2)
                 m1.connect(m2, color, style)
                 m1.draw(colP, mark)
                 m2.draw(colP, mark)

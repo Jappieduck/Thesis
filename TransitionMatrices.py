@@ -12,109 +12,200 @@ c = sp.IndexedBase('c')
 
 i, j = sp.symbols('i j', cls=sp.Idx)
 z = sp.symbols('z')
+x = sp.symbols('x')
 
 
-def ai(soort, index):
+def ai(n, soort, index):
     i0, j0 = index
     if soort == 1:
         i = i0
         j = j0
-        return a[i, j] / c[i, j]
+        return a[i % r, j % r]
     elif soort == 2:
         i = 2 * n - j0 - 1
-        j = i0 + i - n
+        j = n + i0 - j0 - 1
         return b[i % r, j % r] / a[i % r, j % r]
     elif soort == 3:
-        if j0 + 1 >= i0:
-            i = n + j0 - i0
-            j = 2 * n - j0 - 1 + i - n
-        else:
-            i = n + j0 - i0
-            j = 2 * n - i0 - 1
-        return c[i % r, j % r] / b[i % r, j % r]
+        i = n + j0 - i0
+        j = 2 * n - i0 - 1
+        return 1 / b[i % r, j % r]
 
 
-def bi(soort, index):
+def bi(n, soort, index):
     i0, j0 = index
     if soort == 1:
         i = i0
         j = j0
-        return b[i, j] / c[i, j]
+        return b[i % r, j % r]
     elif soort == 2:
         i = 2 * n - j0 - 1
-        j = i0 + i - n
-        return c[i % r, j % r] / a[i % r, j % r]
+        j = n + i0 - j0 - 1
+        return 1 / a[i % r, j % r]
     elif soort == 3:
-        if j0 + 1 >= i0:
-            i = n + j0 - i0
-            j = 2 * n - j0 - 1 + i - n
-        else:
-            i = n + j0 - i0
-            j = 2 * n - i0 - 1
+        i = n + j0 - i0
+        j = 2 * n - i0 - 1
         return a[i % r, j % r] / b[i % r, j % r]
 
 
-def T(m, var, soort):
+def T(n, m, var, soort):
     matrix = sp.zeros(n, n)
     for k in range(0, n):
         if k != n - 1:
-            matrix[k, k] = ai(soort, (m - 1, k))
-            matrix[k, (k + 1) % n] = bi(soort, (m - 1, k))
+            matrix[k, k] = ai(n, soort, (k, m - 1))
+            matrix[k, (k + 1) % n] = bi(n, soort, (k, m - 1))
         else:
-            matrix[k, k] = ai(soort, (m - 1, k))
-            matrix[k, (k + 1) % n] = bi(soort, (m - 1, k)) * var
+            matrix[k, k] = ai(n, soort, (k, m - 1))
+            matrix[k, (k + 1) % n] = bi(n, soort, (k, m - 1)) * var
     return matrix
 
 
-def W(var, soort):
+# Method to substitute the conditions we need
+def conditions(n, expr):
+    newexpr = expr
+    for i in range(r):
+        cond1 = ai(n, 1, (0, i)) * ai(n, 1, (1, i)) * ai(n, 1, (2, i))
+        newexpr = newexpr.subs(cond1, 1)
+        newexpr = newexpr.subs(cond1 ** (-1), 1)
+        cond3 = (ai(n, 1, (i, 0)) * ai(n, 1, (i, 1)) * ai(n, 1, (i, 2))) / (bi(n, 1, (i, 0)) * bi(n, 1, (i, 1)) * bi(n, 1, (i, 2)))
+        newexpr = newexpr.subs(cond3, 1)
+        newexpr = newexpr.subs(cond3 ** (-1), 1)
+        cond2 = bi(n, 1, (0, 0 + i)) * bi(n, 1, (1, 1 + i)) * bi(n, 1, (2, 2 + i))
+        newexpr = newexpr.subs(cond2, 1)
+        newexpr = newexpr.subs(cond2 ** (-1), 1)
+    return newexpr
+
+
+def W(n, var, soort):
     W = 1
     for i in range(r):
-        W = W * T(r, var, soort)
-    return W
+        W = W * T(n, r, var, soort)
+    for i in range(r):
+        for j in range(r):
+            W[i, j] = W[i, j].expand()
+    return conditions(n, W)
 
 
-def checkCondition1():
+def charpol(matrix):
+    return conditions(n, conditions(n, matrix.charpoly(x)).expand())
+
+
+def A(soort):
+    return ai(n, soort, (1, 1)) * ai(n, soort, (1, 2)) * bi(n, soort, (2, 1)) * bi(n, soort, (2, 2))
+
+
+def B(soort):
+    return ai(n, soort, (1, 1)) * ai(n, soort, (2, 3)) * bi(n, soort, (2, 1)) * bi(n, soort, (1, 2))
+
+
+def C(soort):
+    return ai(n, soort, (2, 2)) * ai(n, soort, (2, 3)) * bi(n, soort, (1, 1)) * bi(n, soort, (1, 2))
+
+
+def Q(soort):
+    return conditions(n, ((A(soort) + B(soort) + C(soort)) ** 3 / (A(soort) * B(soort) * C(soort)))).simplify()
+
+
+def checkPol(pol1, pol2):
+    d1 = sp.degree(pol1, x)
+    d2 = sp.degree(pol2, x)
+    coeff1 = pol1.all_coeffs()
+    coeff2 = pol2.all_coeffs()
+    if d1 == d2:
+        for i in range(len(coeff1)):
+            if coeff1[i] != coeff2[i]:
+                return False
+        return True
+    else:
+        return False
+
+
+# Checks which Ti of type 1 have same characteristic polynomial as other Tj of other types, and returns pairs that
+# which have the same characteristic polynomial
+def checkSimilarities():
+    similars = []
+    for i in range(1, r + 1):
+        pol1 = T(n, i, z, 1).charpoly(x)
+        for j in range(2, r + 1):
+            for k in range(1, r + 1):
+                pol2 = T(n, k, z, j).charpoly(x)
+                if checkPol(pol1, pol2):
+                    similars.append(((i, 1), (k, j)))
+    return similars
+
+
+def checkCondition1(n):
     for l in range(1, 4):
-        print('Soort (' + str(l) + ')')
         print('\\begin{equation*}')
         print('    \\begin{split}')
         for k in range(r):
+            product = "{a}^{(" + str(l) + ")}_{0," + str(k) + "}" + "{a}^{(" + str(l) + ")}_{1," + str(
+                k) + "}" + "{a}^{(" + str(l) + ")}_{2," + str(k) + "} = "
             if k != r - 1:
-                print('        j = ' + str(k) + '&: ' + LTX.toLTX(ai(l, (0, k)) * ai(l, (1, k)) * ai(l, (2, k))) + "\\\\")
+                print(LTX.mathfrak(
+                    '        ' + product + LTX.toLTX(
+                        ai(n, l, (0, k)) * ai(n, l, (1, k)) * ai(n, l, (2, k))) + " = " + LTX.toLTX(
+                        conditions(n, ai(n, l, (0, k)) * ai(n, l, (1, k)) * ai(n, l, (2, k)))) + "\\\\"))
             else:
-                print('        j = ' + str(k) + '&: ' + LTX.toLTX(ai(l, (0, k)) * ai(l, (1, k)) * ai(l, (2, k))))
+                print(LTX.mathfrak('        ' + product + LTX.toLTX(
+                    ai(n, l, (0, k)) * ai(n, l, (1, k)) * ai(n, l, (2, k))) + " = " + LTX.toLTX(
+                    conditions(n, ai(n, l, (0, k)) * ai(n, l, (1, k)) * ai(n, l, (2, k))))))
         print('    \\end{split}')
         print('\\end{equation*}')
 
 
 def checkCondition2():
     for l in range(1, 4):
-        print('Soort (' + str(l) + ')')
         print('\\begin{equation*}')
         print('    \\begin{split}')
         for k in range(r):
+            product = "{b}^{(" + str(l) + ")}_{0," + str(k % r) + "}" + "{b}^{(" + str(l) + ")}_{1," + str(
+                (k + 1) % r) + "}" + "{b}^{(" + str(l) + ")}_{2," + str((k + 2) % r) + "} = "
             if k != r - 1:
-                print('        &' + LTX.toLTX(
-                    bi(l, (0, k % r)) * bi(l, (1, (1 + k) % r)) * bi(l, (2, (2 + k) % r))) + "\\\\")
+                print(LTX.mathfrak('        ' + product + LTX.toLTX(
+                    bi(n, l, (0, k % r)) * bi(n, l, (1, (1 + k) % r)) * bi(n, l, (2, (2 + k) % r))) + " = " + LTX.toLTX(
+                    conditions(n, bi(n, l, (0, k % r)) * bi(n, l, (1, (1 + k) % r)) * bi(n, l, (2, (2 + k) % r)))) + "\\\\"))
             else:
-                print('        &' + LTX.toLTX(bi(l, (0, k % r)) * bi(l, (1, (1 + k) % r)) * bi(l, (2, (2 + k) % r))))
+                print(LTX.mathfrak('        ' + product + LTX.toLTX(
+                    bi(n, l, (0, k % r)) * bi(n, l, (1, (1 + k) % r)) * bi(n, l, (2, (2 + k) % r))) + " = " + LTX.toLTX(
+                    conditions(n, bi(n, l, (0, k % r)) * bi(n, l, (1, (1 + k) % r)) * bi(n, l, (2, (2 + k) % r))))))
         print('    \\end{split}')
         print('\\end{equation*}')
 
 
-def checkCondition3():
+def checkCondition3(n):
     for l in range(1, 4):
-        print('Soort (' + str(l) + ')')
         print('\\begin{equation*}')
         print('    \\begin{split}')
         for k in range(r):
+            product = ("\\frac{" + "{a}^{(" + str(l) + ")}_{" + str(k) + ",0}" + "{a}^{(" + str(l) + ")}_{" + str(
+                k) + ",1}" + "{a}^{(" + str(l) + ")}_{" + str(k) + ",2}}"
+                       + "{{b}^{(" + str(l) + ")}_{" + str(k) + ",0}" + "{b}^{(" + str(l) + ")}_{" + str(
+                        k) + ", 1}" + "{b}^{(" + str(l) + ")}_{" + str(k) + ",2}} = ")
             if k != r - 1:
-                print('        k = ' + str(k) + '&: ' + LTX.toLTX(
-                    (ai(l, (k, 1)) * ai(l, (k, 2)) * ai(l, (k, 3))) / (
-                                bi(l, (k, 1)) * bi(l, (k, 2)) * bi(l, (k, 3)))) + "\\\\")
+                print('        ' + LTX.mathfrak(product) + LTX.mathfrak(LTX.toLTX(
+                    (ai(n, l, (k, 0)) * ai(n, l, (k, 1)) * ai(n, l, (k, 2))) / (
+                            bi(n, l, (k, 0)) * bi(n, l, (k, 1)) * bi(n, l, (k, 2)))) + " = " + LTX.toLTX(
+                    conditions(n, (ai(n, l, (k, 0)) * ai(n, l, (k, 1)) * ai(n, l, (k, 2))) / (
+                            bi(n, l, (k, 0)) * bi(n, l, (k, 1)) * bi(n, l, (k, 2))))) + "\\\\"))
             else:
-                print('        k = ' + str(k) + '&: ' + LTX.toLTX(
-                    (ai(l, (k, 1)) * ai(l, (k, 2)) * ai(l, (k, 3))) / (
-                            bi(l, (k, 1)) * bi(l, (k, 2)) * bi(l, (k, 3)))))
+                print('        ' + LTX.mathfrak(product) + LTX.mathfrak(LTX.toLTX(
+                    (ai(n, l, (k, 0)) * ai(n, l, (k, 1)) * ai(n, l, (k, 2))) / (
+                            bi(n, l, (k, 0)) * bi(n, l, (k, 1)) * bi(n, l, (k, 2)))) + " = " + LTX.toLTX(
+                    conditions(n, (ai(n, l, (k, 0)) * ai(n, l, (k, 1)) * ai(n, l, (k, 2))) / (
+                            bi(n, l, (k, 0)) * bi(n, l, (k, 1)) * bi(n, l, (k, 2)))))))
         print('    \\end{split}')
         print('\\end{equation*}')
+
+
+def checkCondition4():
+    for n in range(3):
+        for l in range(1, 4):
+            L1 = ai(n, l, (0, 0)) * bi(n, l, (1, 0))
+            R1 = ai(n, l, (1, 1)) * bi(n, l, (0, 0))
+            L2 = ai(n, l, (0, 1)) * bi(n, l, (0, 0))
+            R2 = ai(n, l, (1, 2)) * bi(n, l, (0, 1))
+            print("\\begin{align*}")
+            print(LTX.mathfrak(LTX.toLTX(sp.simplify(L1/R1)) + "\\neq 1" + "&&" + LTX.toLTX(sp.simplify(L2/R2)))+ "\\neq 1")
+            print("\\end{align*}")
+
+checkCondition4()

@@ -4,9 +4,8 @@ import matplotlib.pyplot as plt
 import point as P
 import hexagon as H
 
-# Some constant, namely the origin and where to save figures. I changed it
+# Some constant, namely the origin and where to save figures.
 O = P.Point((0, 0))
-# pad = 'Insert Path where you want to export your figures to'
 pad = r'D:\School\2de jaar Master\Thesis\LaTeX\Klad\Bewijzen\\'
 
 
@@ -18,7 +17,7 @@ def gridInHexagon(length, centers):
     plt.axis('equal')
     plt.axis('off')
     name = 'GridInHexagon.png'
-    plt.savefig(pad + name, bbox_inches='tight')
+    # plt.savefig(pad + name, bbox_inches='tight')
     plt.show()
 
 
@@ -29,7 +28,7 @@ def bipartiteGraph(length):
     plt.axis('equal')
     plt.axis('off')
     name = 'BipartiteGraph.png'
-    plt.savefig(pad + name, bbox_inches='tight')
+    # plt.savefig(pad + name, bbox_inches='tight')
     plt.show()
 
 
@@ -40,10 +39,12 @@ def randomDimes(length):
     D.drawBipartitGraph(zeshoek)
     D.drawDimes(lozenges)
     beta, alpha = D.get_Centroids(zeshoek)
-    for c in beta:
-        c.drawPoint()
-    for c in alpha:
-        c.drawPoint()
+    for col in beta:
+        for c in col:
+            c.drawPoint()
+    for col in alpha:
+        for c in col:
+            c.drawPoint()
     plt.axis('equal')
     plt.axis('off')
     name = 'DimerModel.png'
@@ -51,10 +52,12 @@ def randomDimes(length):
     plt.show()
 
 
-# draw a random tiling
+# Draw a random tiling
 def randomTiles(length):
     zeshoek = H.Hexagon(O, length)
     lozenges = D.randomTiling(zeshoek)
+    for loz in lozenges:
+        loz.draw()
     plt.axis('equal')
     plt.axis('off')
     if length == 1:
@@ -79,10 +82,12 @@ def dimersOnTiling(length):
     D.drawLozenges(lozenges)
     D.drawDimes(lozenges)
     beta, alpha = D.get_Centroids(zeshoek)
-    for c in beta:
-        c.drawPoint()
-    for c in alpha:
-        c.drawPoint()
+    for col in beta:
+        for c in col:
+            c.drawPoint()
+    for col in alpha:
+        for c in col:
+            c.drawPoint()
     plt.axis('equal')
     plt.axis('off')
     name = 'TilingAndDimers.png'
@@ -90,23 +95,8 @@ def dimersOnTiling(length):
     plt.show()
 
 
-# Draw a black point with its neighbours and connections
-def drawVert():
-    p = C.Centroid((0, 0), 'beta')
-    buren = p.getConnect()
-    kleuren = ['green', 'blue', 'black']
-    for i in range(len(buren)):
-        p.connect(buren[i], kleuren[i], '-')
-        buren[i].drawPoint()
-    p.drawPoint()
-    plt.axis('equal')
-    plt.axis('off')
-    name = 'betaVertex.png'
-    plt.savefig(pad + name, bbox_inches='tight')
-    plt.show()
-
-
 # Draw the path system of a certain construction on top of random tiling
+# LR is iota = 1, ROLB is iota = 2 and LORB is iota = 3
 def plotPathSystem(length, construct):
     zeshoek = H.Hexagon(O, length)
     lozenges = D.randomTiling(zeshoek)
@@ -127,10 +117,12 @@ def dimerOfTiling(length):
     D.drawLozenges(lozenges)
     D.drawDimes(lozenges)
     beta, alpha = D.get_Centroids(zeshoek)
-    for c in beta:
-        c.drawPoint()
-    for c in alpha:
-        c.drawPoint()
+    for col in beta:
+        for c in col:
+            c.drawPoint()
+    for col in alpha:
+        for c in col:
+            c.drawPoint()
     plt.axis('equal')
     plt.axis('off')
     name = 'DimersOfTiling.png'
@@ -138,7 +130,7 @@ def dimerOfTiling(length):
     plt.show()
 
 
-# Draw the grid cooresponding to a certain path system construction on top of a hexagon with it triangular grid
+# Draw the grid corresponding to a certain path system construction on top of a hexagon with it triangular grid
 def pathGrid(length, soort, weight):
     zeshoek = H.Hexagon(O, length)
     D.fillHexagon(zeshoek, False)
@@ -151,5 +143,3 @@ def pathGrid(length, soort, weight):
     plt.axis('off')
     plt.savefig(pad + name, bbox_inches='tight')
     plt.show()
-
-

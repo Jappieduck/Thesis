@@ -23,3 +23,10 @@ def writeMatrix(matrix):
             newstring = newstring + "\n"
     newstring = newstring + "\\end{pmatrix}"
     return newstring
+
+
+def mathfrak(string):
+    replacing = ["{a}", "{b}", "{c}"]
+    for letter in replacing:
+        string = string.replace(letter, "\\mathfrak" + letter)
+    return string

@@ -5,11 +5,6 @@ import triangle as T
 import lozenge as L
 import random
 
-# Some constant that will be needed in several methods
-RB = P.Point((m.cos(m.pi / 6), m.sin(m.pi / 6)))
-LB = P.Point((-m.cos(m.pi / 6), m.sin(m.pi / 6)))
-B = P.Point((0, 1))
-
 
 # Here are some methods used to draw different grids or repeating structures and methods needed to do so
 def get_Centroids(zeshoek):
@@ -17,13 +12,14 @@ def get_Centroids(zeshoek):
     white = []
     v1 = P.Point((m.sqrt(3) / 2, -0.5))
     v2 = P.Point((-m.sqrt(3) / 2, -0.5))
-    up = P.Point((0, 1))
+    v0 = P.Point((0, 1))
+    shift = P.Point((m.sqrt(3)/6, 0.5))
     n = zeshoek.getLength()
     for i in range(n):
         colB = []
         colW = []
         for j in range(n + i):
-            b = v2.times(n - 1).plus(P.Point((-m.sqrt(3) / 3, 0))).plus(up.times(j)).plus(v1.times(i))
+            b = (v0.times(j)).plus(v1.times(i)).plus(v2.times(n)).plus(shift)
             b = C.Centroid((b.getX(), b.getY()), 'beta')
             colB.append(b)
             if i > 0:
@@ -33,11 +29,11 @@ def get_Centroids(zeshoek):
         black.append(colB)
         if len(colW) > 0:
             white.append(colW)
-    for i in range(n - 1, 2 * n - 1):
+    for i in range(n, 2 * n):
         colB = []
         colW = []
-        for j in range(3 * n - i - 1):
-            b = v1.times(n).plus(up.times(j)).plus(v2.times(2 * n - i - 2)).plus(P.Point((-m.sqrt(3) / 3, 0)))
+        for j in range(i-n, 2*n):
+            b = b = (v0.times(j)).plus(v1.times(i)).plus(v2.times(n)).plus(shift)
             b = C.Centroid((b.getX(), b.getY()), 'beta')
             colB.append(b)
             w = b.plus(P.Point((-m.sqrt(3) / 3, 0)))
@@ -46,8 +42,9 @@ def get_Centroids(zeshoek):
         black.append(colB)
         white.append(colW)
     colW = []
-    for j in range(n):
-        w = v1.times(n - 1).plus(up.times(j)).plus(P.Point((m.sqrt(3) / 3, 0)))
+    for j in range(n, 2*n):
+        b = (v0.times(j)).plus(v1.times(2*n)).plus(v2.times(n)).plus(shift)
+        w = b.plus(P.Point((-m.sqrt(3) / 3, 0)))
         w = C.Centroid((w.getX(), w.getY()), 'alpha')
         colW.append(w)
     white.append(colW)

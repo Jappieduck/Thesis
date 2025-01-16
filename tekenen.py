@@ -3,40 +3,54 @@ import gridForm as D
 import matplotlib.pyplot as plt
 import point as P
 import hexagon as H
+import triangle as T
+import math as m
 
 # Some constant, namely the origin and where to save figures.
 O = P.Point((0, 0))
-pad = r'D:\School\2de jaar Master\Thesis\LaTeX\Klad\Bewijzen\\'
+pad = r'D:\School\2de jaar Master\Thesis\LaTeX\Thesis\Paper\Afbeeldingen\\'
 
 
 # Draw the triangular grid inside a hexagon, and the black and white centroids if wanted
 # centers is a boolean here
-def gridInHexagon(length, centers):
+def gridInHexagon(length, centroidType):
     zeshoek = H.Hexagon(O, length)
-    D.fillHexagon(zeshoek, centers)
+    eps = 0
+    if centroidType != "black" and centroidType != "white":
+        eps += 1
+    D.fillHexagon(H.Hexagon(O, length + eps), centroidType)
+    zeshoek.draw('black')
     plt.axis('equal')
     plt.axis('off')
     name = 'GridInHexagon.png'
-    # plt.savefig(pad + name, bbox_inches='tight')
+    if centroidType == "black" or centroidType == "white":
+        D.naming(zeshoek, 0, centroidType)
+        name = 'Enumeration.png'
+    plt.savefig(pad + name, bbox_inches='tight')
     plt.show()
 
 
 # Draw the bipartite graph
-def bipartiteGraph(length):
+def bipartiteGraph(length, weight):
     zeshoek = H.Hexagon(O, length)
-    D.drawBipartitGraph(zeshoek)
+    D.drawBipartitGraph(zeshoek, weight)
     plt.axis('equal')
     plt.axis('off')
     name = 'BipartiteGraph.png'
-    # plt.savefig(pad + name, bbox_inches='tight')
+    if weight:
+        name = "bipartiteWeights.png"
+    plt.savefig(pad + name, bbox_inches='tight')
     plt.show()
 
 
-# Draw a random dimer model
+bipartiteGraph(2, True)
+
+
+# Draw a random dimer covering
 def randomDimes(length):
     zeshoek = H.Hexagon(O, length)
     lozenges = D.randomTiling(zeshoek)
-    D.drawBipartitGraph(zeshoek)
+    D.drawBipartitGraph(zeshoek, False)
     D.drawDimes(lozenges)
     beta, alpha = D.get_Centroids(zeshoek)
     for col in beta:
@@ -78,7 +92,7 @@ def randomTiles(length):
 def dimersOnTiling(length):
     zeshoek = H.Hexagon(O, length)
     lozenges = D.randomTiling(zeshoek)
-    D.drawBipartitGraph(zeshoek)
+    D.drawBipartitGraph(zeshoek, False)
     D.drawLozenges(lozenges)
     D.drawDimes(lozenges)
     beta, alpha = D.get_Centroids(zeshoek)
@@ -91,6 +105,8 @@ def dimersOnTiling(length):
     plt.axis('equal')
     plt.axis('off')
     name = 'TilingAndDimers.png'
+    if weight:
+        name = "dimerWeight.png"
     plt.savefig(pad + name, bbox_inches='tight')
     plt.show()
 
@@ -131,15 +147,33 @@ def dimerOfTiling(length):
 
 
 # Draw the grid corresponding to a certain path system construction on top of a hexagon with it triangular grid
-def pathGrid(length, soort, weight):
+def pathGrid(length, soort, weight, enum):
     zeshoek = H.Hexagon(O, length)
-    D.fillHexagon(zeshoek, False)
-    zeshoek.draw('gray')
-    name = "padSystemGraph" + soort
+    if not weight:
+        D.fillHexagon(zeshoek, False)
+    zeshoek.draw('black')
+    name = "padSystemGraph" + soort + ".png"
     if weight:
-        name = name + "WithWeightIndication" + weight
-    D.drawPathGrid(zeshoek, soort, weight)
+        name = "padSystemWithWeight" + soort + ".png"
+    if enum:
+        name = "padSystemEnumerated" + soort + ".png"
+    D.drawPathGrid(zeshoek, soort, weight, enum)
     plt.axis('equal')
     plt.axis('off')
     plt.savefig(pad + name, bbox_inches='tight')
+    plt.show()
+
+
+def driehoeken():
+    b = C.Centroid((0, 0), "beta")
+    w = C.Centroid((-m.sqrt(3) / 3, 0), "alpha")
+    driehoekB = T.Triangle(b, "beta")
+    driehoekW = T.Triangle(w, "alpha")
+    driehoekB.draw('black', '-')
+    driehoekW.draw('black', '-')
+    b.drawPoint()
+    w.drawPoint()
+    plt.axis('equal')
+    plt.axis('off')
+    plt.savefig(pad + "Driehoeken.png", bbox_inches='tight')
     plt.show()

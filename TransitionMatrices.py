@@ -66,7 +66,8 @@ def conditions(n, expr):
         cond1 = ai(n, 1, (0, i)) * ai(n, 1, (1, i)) * ai(n, 1, (2, i))
         newexpr = newexpr.subs(cond1, 1)
         newexpr = newexpr.subs(cond1 ** (-1), 1)
-        cond3 = (ai(n, 1, (i, 0)) * ai(n, 1, (i, 1)) * ai(n, 1, (i, 2))) / (bi(n, 1, (i, 0)) * bi(n, 1, (i, 1)) * bi(n, 1, (i, 2)))
+        cond3 = (ai(n, 1, (i, 0)) * ai(n, 1, (i, 1)) * ai(n, 1, (i, 2))) / (
+                bi(n, 1, (i, 0)) * bi(n, 1, (i, 1)) * bi(n, 1, (i, 2)))
         newexpr = newexpr.subs(cond3, 1)
         newexpr = newexpr.subs(cond3 ** (-1), 1)
         cond2 = bi(n, 1, (0, 0 + i)) * bi(n, 1, (1, 1 + i)) * bi(n, 1, (2, 2 + i))
@@ -90,15 +91,15 @@ def charpol(matrix):
 
 
 def A(soort):
-    return ai(n, soort, (1, 1)) * ai(n, soort, (1, 2)) * bi(n, soort, (2, 1)) * bi(n, soort, (2, 2))
+    return ai(n, soort, (0, 0)) * ai(n, soort, (0, 1)) * bi(n, soort, (1, 0)) * bi(n, soort, (1, 1))
 
 
 def B(soort):
-    return ai(n, soort, (1, 1)) * ai(n, soort, (2, 3)) * bi(n, soort, (2, 1)) * bi(n, soort, (1, 2))
+    return ai(n, soort, (0, 0)) * ai(n, soort, (1, 2)) * bi(n, soort, (1, 0)) * bi(n, soort, (0, 1))
 
 
 def C(soort):
-    return ai(n, soort, (2, 2)) * ai(n, soort, (2, 3)) * bi(n, soort, (1, 1)) * bi(n, soort, (1, 2))
+    return ai(n, soort, (1, 1)) * ai(n, soort, (1, 2)) * bi(n, soort, (0, 0)) * bi(n, soort, (0, 1))
 
 
 def Q(soort):
@@ -163,7 +164,8 @@ def checkCondition2():
             if k != r - 1:
                 print(LTX.mathfrak('        ' + product + LTX.toLTX(
                     bi(n, l, (0, k % r)) * bi(n, l, (1, (1 + k) % r)) * bi(n, l, (2, (2 + k) % r))) + " = " + LTX.toLTX(
-                    conditions(n, bi(n, l, (0, k % r)) * bi(n, l, (1, (1 + k) % r)) * bi(n, l, (2, (2 + k) % r)))) + "\\\\"))
+                    conditions(n, bi(n, l, (0, k % r)) * bi(n, l, (1, (1 + k) % r)) * bi(n, l,
+                                                                                         (2, (2 + k) % r)))) + "\\\\"))
             else:
                 print(LTX.mathfrak('        ' + product + LTX.toLTX(
                     bi(n, l, (0, k % r)) * bi(n, l, (1, (1 + k) % r)) * bi(n, l, (2, (2 + k) % r))) + " = " + LTX.toLTX(
@@ -197,15 +199,4 @@ def checkCondition3(n):
         print('\\end{equation*}')
 
 
-def checkCondition4():
-    for n in range(3):
-        for l in range(1, 4):
-            L1 = ai(n, l, (0, 0)) * bi(n, l, (1, 0))
-            R1 = ai(n, l, (1, 1)) * bi(n, l, (0, 0))
-            L2 = ai(n, l, (0, 1)) * bi(n, l, (0, 0))
-            R2 = ai(n, l, (1, 2)) * bi(n, l, (0, 1))
-            print("\\begin{align*}")
-            print(LTX.mathfrak(LTX.toLTX(sp.simplify(L1/R1)) + "\\neq 1" + "&&" + LTX.toLTX(sp.simplify(L2/R2)))+ "\\neq 1")
-            print("\\end{align*}")
-
-checkCondition4()
+print(((Q(1) - Q(2)).expand()).simplify())

@@ -77,3 +77,8 @@ class Centroid(P.Point):
         super().connect(p, color, style)
         self.setConnection(True)
         p.setConnection(True)
+
+    def arrow(self, p, col):
+        super().arrow(p, col)
+        self.setConnection(True)
+        p.setConnection(True)

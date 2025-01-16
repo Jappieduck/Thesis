@@ -39,6 +39,12 @@ class Point:
         x2, y2 = p.getX(), p.getY()
         plt.plot([x1, x2], [y1, y2], color=color, linestyle=style)
 
+    def arrow(self, p, color):
+        self.connect(p, color, '-')
+        x1, y1 = self.getX(), self.getY()
+        x2, y2 = p.getX(), p.getY()
+        plt.arrow((x1+x2)/2, (y1+y2)/2, 0.01*(x2-x1)/2, 0.01*(y2-y1)/2, color=color, head_width=0.1, head_length=0.2)
+
     # Look if the point is inside a list
     def find(self, lst):
         for value in lst:

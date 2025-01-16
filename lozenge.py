@@ -44,7 +44,7 @@ class Lozenge:
     # Draw the dimer corresponding to the lozenge tile
     def drawDime(self):
         centres = [self.getBeta(), self.getAlpha()]
-        centres[0].connect(centres[1], 'red', '-')
+        centres[0].connect(centres[1], 'magenta', '-')
 
     # Draw the lozenge tile
     def draw(self):
@@ -72,38 +72,38 @@ class Lozenge:
             if soort == 'LR':
                 m1 = hoekpunten[0].plus(hoekpunten[3]).times(1 / 2)
                 m2 = hoekpunten[1].plus(hoekpunten[2]).times(1 / 2)
-                m1.connect(m2, color, style)
+                m1.arrow(m2, color)
                 m1.draw(colP, mark)
                 m2.draw(colP, mark)
             elif soort == 'ROLB':
                 m1 = hoekpunten[0].plus(hoekpunten[1]).times(1 / 2)
                 m2 = hoekpunten[2].plus(hoekpunten[3]).times(1 / 2)
-                m1.connect(m2, color, style)
+                m2.arrow(m1, color)
                 m1.draw(colP, mark)
                 m2.draw(colP, mark)
         elif lozSoort == 'Down':
             if soort == 'LORB':
                 m1 = hoekpunten[0].plus(hoekpunten[3]).times(1 / 2)
                 m2 = hoekpunten[1].plus(hoekpunten[2]).times(1 / 2)
-                m1.connect(m2, color, style)
+                m1.arrow(m2, color)
                 m1.draw(colP, mark)
                 m2.draw(colP, mark)
             elif soort == 'LR':
                 m1 = hoekpunten[0].plus(hoekpunten[1]).times(1 / 2)
                 m2 = hoekpunten[2].plus(hoekpunten[3]).times(1 / 2)
-                m1.connect(m2, color, style)
+                m2.arrow(m1, color)
                 m1.draw(colP, mark)
                 m2.draw(colP, mark)
         elif lozSoort == 'Left':
             if soort == 'ROLB':
                 m1 = hoekpunten[0].plus(hoekpunten[3]).times(1 / 2)
                 m2 = hoekpunten[1].plus(hoekpunten[2]).times(1 / 2)
-                m1.connect(m2, color, style)
+                m2.arrow(m1, color)
                 m1.draw(colP, mark)
                 m2.draw(colP, mark)
             elif soort == 'LORB':
                 m1 = hoekpunten[0].plus(hoekpunten[1]).times(1 / 2)
                 m2 = hoekpunten[2].plus(hoekpunten[3]).times(1 / 2)
-                m1.connect(m2, color, style)
+                m1.arrow(m2, color)
                 m1.draw(colP, mark)
                 m2.draw(colP, mark)
